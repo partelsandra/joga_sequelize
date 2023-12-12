@@ -2,7 +2,7 @@
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize('mysql://root:qwerty@localhost:3306/joga_sequelize')
 // Read models data for table representation
-const models = require('../models');
+const models = require('../../models');
 
 // Create new article into data table
 const createArticle = (req, res) => {

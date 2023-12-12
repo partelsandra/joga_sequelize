@@ -1,39 +1,49 @@
 // Get connection to database ORM object
 const Sequelize = require("sequelize");
-const sequelize = new Sequelize('mysql://root:qwerty@localhost:3306/joga_sequelize')
+const sequelize = new Sequelize('mysql://root:qwerty@localhost:3306/joga_sequelize');
+
 // Read models data for table representation
 const models = require('../models');
+const Article = require('../models/article')(sequelize, Sequelize.DataTypes);
 
-// Create new article into data table
-const createArticle = (req, res) => {
-   // get form data
-    let name = req.body.name
-    let slug = req.body.slug
-    let image = req.body.image
-    let body = req.body.body
+// Get all data from table
+const getAllArticles = (req, res) => {
+    models.findAll() // Corrected the syntax here
+        .then(articles => {
+            console.log(articles);
+            return res.status(200).json({ articles });
+        })
+        .catch(error => {
+            return res.status(500).json({ error: error.message });
+        });
+}
 
-    //create new article by Article model
-    const newArticle = models.Article.create({
-        // Add values for NOT NULL fields
-        // Left one: data table fields,
-        // right one: values from form
-        name: name,
-        slug: slug,
-        image: image,
-        body: body,
-        // Publish date generate as now
-        published: new Date().toISOString().slice(0, 19).replace('T', ' ')
+// Show article by this slug
+const getArticleBySlug = (req, res) => {
+    models.findOne({
+        where: {
+            slug: req.params.slug
+        },
+        include: [{
+            model:models.Author
+        }],
     })
         .then(article => {
-            console.log(article);
-            return res.status(200).json({ message: 'New article is added' });
+            if (article) {
+                console.log(article);
+                return res.status(200).json({ article });
+            } else {
+                return res.status(404).json({ message: 'Article not found' });
+            }
         })
         .catch(error => {
             return res.status(500).send(error.message);
         });
 };
 
+
 // Export controller functions
 module.exports = {
-    createArticle
+    getAllArticles,
+    getArticleBySlug
 };
