@@ -18,15 +18,22 @@ sequelize
         console.error('Unable to connect to the database', err); // Add a comma here
     });
 
-app.get("/", (req, res) => {
-    res.json({ message: "Welcome to sequelize application" });
+// using routes and controllers
+const articleRouter = require('./routes/article');
+const authorRouter = require('./routes/author');
+app.use('/', articleRouter);
+
+app.use('/', authorRouter);
+
+app.use('/article', articleRouter)
+app.use('/admin/article', articleRouter)
+
+// simple route
+app.get("/", (req,res) => {
+    res.json({message: "Welcome to sequelize application."});
 });
 
-//using routes and controllers
-const articleRouter = require('./routes/article');
-app.use('/', articleRouter);
-app.use('/article', articleRouter);
-app.use('/admin/article', articleRouter)
+// listen requests
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
 });
